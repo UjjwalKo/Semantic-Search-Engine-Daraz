@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daraz Laptop Search</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+        .centered {
+            text-align: center;
+            color: white;
+        }
+        .form-control {
+            background-color: white;
+            color: black;
+        }
+        .btn-search {
+            background-color: red;
+            color: white;
+        }
+        .result-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 10px;
+            background-color: #333;
+        }
+        .result-card h5, .result-card p {
+            color: white;
+        }
+        /* Spinner styles */
+        #loadingSpinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.5em;
+        }
+    </style>
+    <script>
+        // Show loading spinner for 2 seconds on form submit
+        function showLoadingSpinner(event) {
+            event.preventDefault(); // Prevents the form from submitting immediately
+
+            // Show the spinner
+            document.getElementById("loadingSpinner").style.display = "block";
+
+            // Wait for 2 seconds, then submit the form
+            setTimeout(function() {
+                document.getElementById("searchForm").submit();
+            }, 2000);
+        }
+    </script>
+</head>
+<body>
+    <div class="container centered">
+        <h1>💻 Semantic Search of Daraz Laptop</h1>
+        <h3 style="color: #4CAF50;">Search for the best laptops with AI-powered search!</h3>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner">
+            <span class="spinner-border text-light"></span> Loading, please wait...
+        </div>
+
+        <!-- Search Form -->
+        <form method="POST" action="{% url 'index' %}" id="searchForm" onsubmit="showLoadingSpinner(event)">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="text" name="query" class="form-control" placeholder="Enter a product search query" required>
+            </div>
+            <button type="submit" class="btn btn-search">Search</button>
+        </form>
+
+        {% if results %}
+            <h4 style="color: #2196F3;">Top matches for: '{{ query }}'</h4>
+            {% for result in results %}
+                <div class="result-card">
+                    <h5>🔹 Product title: {{ result.title }}</h5>
+                    <p style="color: #FFC107;">Price: NRP {{ result.price }}</p>
+                    <p style="color: #4CAF50;">Rating: {{ result.rating }}</p>
+                    <p>Color: {{ result.color }}</p>
+                    <p><a href="{{ result.link }}" target="_blank" style="color: #87CEEB;">Link to Product</a></p>
+                    <p><i>Relevance Score</i>: {{ result.score }}</p>
+                </div>
+            {% endfor %}
+        {% elif query %}
+            <div class="alert alert-danger">No matching product found.</div>
+        {% endif %}
+    </div>
+</body>
+</html>
